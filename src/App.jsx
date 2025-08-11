@@ -1,8 +1,9 @@
-import { useState } from "react";
+import CategoryItem from './components/category-item/category-item.component';
 import './categories.styles.scss'
 
+
 function App() {
-  const [count, setCount] = useState(0);
+ 
   const categories = [
      {
       id: 1,
@@ -32,19 +33,13 @@ function App() {
   ];
 
   return (
-    <>
+    
       <div className="categories-container">
-        {categories.map(({ title, id,imageUrl }) => (
-          <div key={id} className="category-container">
-            <div className="category-body-container">
-              <div className="background-image" style={{ backgroundImage: `url(${imageUrl})`, }}></div>
-              <h2>{title}</h2>
-              <p>Kjøp nå</p>
-            </div>
-          </div>
+        {categories.map((category) => (
+          <CategoryItem key={category.id} category={category}/>
         ))}
       </div>
-    </>
+    
   );
 }
 
