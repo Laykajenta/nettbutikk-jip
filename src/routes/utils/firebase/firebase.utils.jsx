@@ -1,13 +1,14 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithPopup,
   signInWithRedirect,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
-} from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { Await } from 'react-router-dom';
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { Await } from "react-router-dom";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,31 +17,32 @@ const firebaseConfig = {
   projectId: "jip-nettbutikk",
   storageBucket: "jip-nettbutikk.firebasestorage.app",
   messagingSenderId: "989890478059",
-  appId: "1:989890478059:web:b2da234bbfd91662efa3ae"
+  appId: "1:989890478059:web:b2da234bbfd91662efa3ae",
 };
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
-    prompt: "select_account"
+  prompt: "select_account",
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
-export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
 
 export const createUserDocumentFromAuth = async (
   userAuth,
-  additionalInformation={displayName: 'mike'}
+  additionalInformation = { displayName: "mike" }
 ) => {
   if (!userAuth) return;
-  const userDocRef = doc(db, 'users', userAuth.uid);
-  
+  const userDocRef = doc(db, "users", userAuth.uid);
+
   const userSnapShot = await getDoc(userDocRef);
-  
 
   // if user data does not exists
   if (!userSnapShot.exists()) {
@@ -55,9 +57,8 @@ export const createUserDocumentFromAuth = async (
         ...additionalInformation,
       });
     } catch (error) {
-      console.log('error creating the user', error.message);
+      console.log("error creating the user", error.message);
     }
-    
   }
   return userDocRef;
 };
@@ -67,4 +68,8 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
 
   return await createUserWithEmailAndPassword(auth, email, password);
 };
+export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
 
+  return await signInWithEmailAndPassword(auth, email, password);
+};

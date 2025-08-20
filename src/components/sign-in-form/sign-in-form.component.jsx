@@ -3,8 +3,9 @@ import { useState } from "react";
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 import {
-  createAuthUserWithEmailAndPassword,
+  signInWithGooglePopup,
   createUserDocumentFromAuth,
+  signInAuthUserWithEmailAndPassword
 } from "../../routes/utils/firebase/firebase.utils";
 import "./sign-in-form.style.scss";
 
@@ -20,12 +21,24 @@ const SignInForm = () => {
     setFormFields(defaultFormFields);
   };
 
+  const signInWithGoogle = async () => {
+    const { user } = await signInWithGooglePopup();
+    await createUserDocumentFromAuth(user);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
+      const response = await signInAuthUserWithEmailAndPassword(email, password);
+      console.log(response);
       resetFormFields();
-    } catch (error) {}
+    } catch (error) {
+      if (error.code === "auth/invalid-credential") {
+        alert('Feil passord eller e-post');
+      }
+      console.log(error);
+    }
   };
 
   const handleChange = (event) => {
@@ -55,8 +68,12 @@ const SignInForm = () => {
           name="password"
           value={password}
         />
-
-        <Button type="submit">Sign In</Button>
+        <div className="buttons-container">
+          <Button type="submit">Sign In</Button>
+          <Button buttonType="google" onClick={signInWithGoogle}>
+            Google Sign In
+          </Button>
+        </div>
       </form>
     </div>
   );
