@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
+import { UserContext } from "../../contexts/user.context";
 import {
   signInWithGooglePopup,
   createUserDocumentFromAuth,
-  signInAuthUserWithEmailAndPassword
+  signInAuthUserWithEmailAndPassword,
 } from "../../routes/utils/firebase/firebase.utils";
 import "./sign-in-form.style.scss";
 
@@ -17,6 +18,8 @@ const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
 
+  const { setCurrentUser } = useContext(UserContext);
+
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
@@ -24,18 +27,24 @@ const SignInForm = () => {
   const signInWithGoogle = async () => {
     const { user } = await signInWithGooglePopup();
     await createUserDocumentFromAuth(user);
+    setCurrentUser(user);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await signInAuthUserWithEmailAndPassword(email, password);
-      console.log(response);
+      const response = await signInAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
+      if (response && response.user) {
+        setCurrentUser(response.user);
+      }
       resetFormFields();
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
-        alert('Feil passord eller e-post');
+        alert("Feil passord eller e-post");
       }
       console.log(error);
     }
